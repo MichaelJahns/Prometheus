@@ -98,33 +98,38 @@ async function isNightOwned(date, msg){
 }
 
 function assignNightRandomly(date, msg){
-    // grab collection of users in call
-    let players = msg.member.voiceChannel.members.array();
-    let contestants =[]; 
-
-    for(let i = 0; i < players.length; i++){
-      let playerName = players[i].user.username;
-      contestants.push(playerName);
-    }
-    // pick one at random
-    const goldenTicket = randomContestant(players.length)
+    //get all users in voiceChannel
+    let contestants = collectContestants(msg.member.voiceChannel)
+    //make a winning number and assign to a user
+    const goldenTicket = randomNumberInRange(contestants.length)
     const charlie = contestants[goldenTicket]    
     // return that user and declare that it is their night
-    msg.channel.send(`Let tonight be ${charlie}'s night`)
-    writeNight(charlie, date)
+    writeNight(charlie, date, msg)
 }
 
-function randomContestant(range){
+function collectContestants(voiceChannel){
+  let applicants = voiceChannel.members.array();
+  let contestants = [];
+  for(let i = 0; i < applicants.length; i++){
+      let contestant = applicants[i].user.username;
+      contestants.push(contestant);
+  }
+  return contestants;
+}
+
+function randomNumberInRange(range){
   return Math.floor(Math.random() * Math.floor(range));
 }
 
-function writeNight(charlie, date){
+function writeNight(charlie, date, msg){
   return db.collection("night").doc(date).set({
     nightOwner : charlie,
-  }).then(function(docRef){
-console.log(`Night Owner ${charlie} written to firestore`)
+  }).then(function(docRef){  
+      msg.channel.send(`Let tonight be ${charlie}'s night`)
+      console.log(`Night Owner ${charlie} written to firestore`)
   }).catch(function(error){
-    console.log(`Failure to write ${charlie} to firestore`)
+      msg.channel.send(`Failed to assign night`)
+      console.log(`Failure to write ${charlie} to firestore`)
   })
 }
 
