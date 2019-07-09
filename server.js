@@ -6,7 +6,6 @@ const prefix = "-";
 
 bot.on('ready', async () => {
   console.log(`${bot.user.tag} is live.`);
-  
   try{
     let link = await bot.generateInvite(["ADMINISTRATOR"]);
     console.log(link);
@@ -42,37 +41,39 @@ bot.on("message", async msg => {
   if(command === `${prefix}assignNight`){
     assignNight(msg)
   }
-  
-  if(command === `${prefix}about`){
-    aboutPrometheus();
+  if(command === `${prefix}pickCaptains`){
+    pickCaptains(msg)
   }
-  
   if(command === `${prefix}cleanUp`){
-    cleanUp(msg);
+    cleanUpBotMessages(msg);
+  }
+  if(command === `${prefix}about`){
+  //   aboutPrometheus();
   }
 })
 
-
-// Forced Clean UP
-async function cleanUp(msg){
-  // grab last 100 messages
-  let history = await msg.channel.fetchMessages({limit : 100});
-  let historyArray = history.array();
-  let counter = 0;
-  for(let msg of historyArray){
-      // check authorship
-    if(msg.author.bot){
-      // delete all messages written by a bot
-      msg.delete();
-      counter++;
-    }
+// Team Captain Functions
+//=======================
+function pickCaptains(msg){
+  if(msg.member.voiceChannel === undefined){
+    msg.channel.send(`You must be in a voice channel to use this command.`)
+    return;
   }
-  // send results
-  msg.channel.send(`I have gone through the last 100 messages, and have deleted ${counter} messages authored by bots`)
+  let contestants = collectContestants(msg.member.voiceChannel);
+  if(contestants.length >= 2){
+  const ticketOne = randomNumberInRange(contestants.length);
+  const captainOne = contestants.splice(ticketOne, 1);
+  const ticketTwo = randomNumberInRange(contestants.length);
+  const captainTwo = contestants.splice(ticketTwo, 1);
+  msg.channel.send(`Let ${captainOne} and ${captainTwo} be the team captains this game.`);  
+  } else{
+    msg.channel.send(`${msg.author} you are alone in that call.`)
+  }
 }
 
 // Night Assignment Functions
-async function assignNight(msg){
+//===========================
+function assignNight(msg){
   // Return is sender is not an active participant
   if(msg.member.voiceChannel === undefined){
     msg.channel.send(`You must be in a voice channel to use this command.`)
@@ -81,15 +82,16 @@ async function assignNight(msg){
   let date = new Date().toDateString();
   isNightOwned(date, msg);
 }
-async function isNightOwned(date, msg){
+
+function isNightOwned(date, msg){
   return db.collection("night").doc(date).get()
     .then(function(doc){
     if(doc.exists){
       // Night is already owned, the dice will not roll again
-      msg.channel.send(`I have already decided that it is ${doc.data().nightOwner}'s night`)
+      msg.channel.send(`I have already decided that it is ${doc.data().nightOwner}'s night.`)
     } else{
       // Night is not owned, a member will be selected at random from the same voice chat as the orginal messages author
-      msg.channel.send(`Tonight has not yet been assigned`)
+      msg.channel.send(`Tonight has not yet been assigned.`)
       assignNightRandomly(date, msg)
     }
   }).catch(function(error){
@@ -102,15 +104,16 @@ function assignNightRandomly(date, msg){
     let contestants = collectContestants(msg.member.voiceChannel)
     //make a winning number and assign to a user
     const goldenTicket = randomNumberInRange(contestants.length)
-    const charlie = contestants[goldenTicket]    
+    const lottoWinner = contestants[goldenTicket]    
     // return that user and declare that it is their night
-    writeNight(charlie, date, msg)
+    writeNight(lottoWinner, date, msg)
 }
 
 function collectContestants(voiceChannel){
   let applicants = voiceChannel.members.array();
   let contestants = [];
   for(let i = 0; i < applicants.length; i++){
+    // Add if statement here to exclude bots from the contest
       let contestant = applicants[i].user.username;
       contestants.push(contestant);
   }
@@ -121,16 +124,36 @@ function randomNumberInRange(range){
   return Math.floor(Math.random() * Math.floor(range));
 }
 
-function writeNight(charlie, date, msg){
+function writeNight(lottoWinner, date, msg){
   return db.collection("night").doc(date).set({
-    nightOwner : charlie,
+    nightOwner : lottoWinner,
   }).then(function(docRef){  
-      msg.channel.send(`Let tonight be ${charlie}'s night`)
-      console.log(`Night Owner ${charlie} written to firestore`)
+      msg.channel.send(`Let tonight be ${lottoWinner}'s night.`)
+      console.log(`Night Owner ${lottoWinner} written to firestore`)
   }).catch(function(error){
-      msg.channel.send(`Failed to assign night`)
-      console.log(`Failure to write ${charlie} to firestore`)
+      msg.channel.send(`Failed to assign night..`)
+      console.log(`Failure to write ${lottoWinner} to firestore`)
   })
+}
+
+// Forced Clean UP
+//================
+async function cleanUpBotMessages(msg){
+  let history = getHistory(msg);
+  let deletedMessagesCount = 0;
+  for(let msg of history){
+    if(msg.author.bot){
+      msg.delete();
+      deletedMessagesCount++;
+    }
+  }
+  msg.channel.send(`I have gone through the last 100 messages, and have deleted ${deletedMessagesCount} messages authored by bots.`)
+}
+
+async function getHistory(msg){
+  let history = await msg.channel.fetchMessages({limit : 100});
+  let historyArray = history.array();
+  return history;
 }
 
 bot.login(process.env.DISCORD_BOT_TOKEN)
