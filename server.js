@@ -6,6 +6,14 @@ const prefix = "-";
 
 bot.on('ready', async () => {
   console.log(`${bot.user.tag} is live.`);
+  bot.user.setStatus('available')
+    bot.user.setPresence({
+        game: {
+            name: 'paint dry',
+            type: "WATCHING",
+            url: " "
+        }
+    });
   try{
     let link = await bot.generateInvite(["ADMINISTRATOR"]);
     console.log(link);
@@ -37,7 +45,7 @@ bot.on("message", async msg => {
   let command = splitMessage[0];
   
   if(!command.startsWith(prefix)) return;
-  
+
   if(command === `${prefix}assignNight`){
     assignNight(msg)
   }
@@ -50,10 +58,38 @@ bot.on("message", async msg => {
   if(command === `${prefix}about`){
     aboutPrometheus(msg);
   }
-  if(command === `${prefix}test`){
-    // tester(msg);
+  if(command === `${prefix}adventure`){
+    adventureStart(msg);
   }
+  // else if{
+  //   msg.channel.send(`${command} is not a known command. For a list of known commands, try <-about>`)
+  // }
 })
+
+function broadcast(msg){
+  msg.channel.send('My message to react to.').then(sentMessage => {
+	sentMessage.react('👍');
+	sentMessage.react('<emoji id>');
+});
+}
+
+function adventureStart(msg){
+  // Collect how many members are in a call
+  // Confirm number with orginator of request
+  // dm every playing memeber their identity card
+  // start game state
+  // check for game over
+  // randomly assign a king
+  // set timeout 5mins
+  // after timeout bot demands a vote be done, reaction collecctor
+  // bot will have two routes
+  // shift king one and allow another xminutes
+  // or
+  // dm the selected team
+  // compile and read results
+  // return result to users
+  // update gamestate
+}
 
 // About Functions
 //================
@@ -99,7 +135,7 @@ function pickCaptains(msg){
 // Night Assignment Functions
 //===========================
 function assignNight(msg){
-  // Return is sender is not an active participant
+  // Return is sender is not an active participant in the voice chat
   if(msg.member.voiceChannel === undefined){
     msg.channel.send(`You must be in a voice channel to use this command.`)
     return;
@@ -139,8 +175,11 @@ function collectContestants(voiceChannel){
   let contestants = [];
   for(let i = 0; i < applicants.length; i++){
     // Add if statement here to exclude bots from the contest
+    if(!applicants[i].user.bot){
+      console.log(i)
       let contestant = applicants[i].user.username;
       contestants.push(contestant);
+    }
   }
   return contestants;
 }
@@ -164,7 +203,7 @@ function writeNight(lottoWinner, date, msg){
 // Forced Clean UP
 //================
 async function cleanUpBotMessages(msg){
-  let history = getHistory(msg);
+  let history = await getHistory(msg);
   let deletedMessagesCount = 0;
   for(let msg of history){
     if(msg.author.bot){
@@ -178,7 +217,7 @@ async function cleanUpBotMessages(msg){
 async function getHistory(msg){
   let history = await msg.channel.fetchMessages({limit : 100});
   let historyArray = history.array();
-  return history;
+  return historyArray;
 }
 
 function getAboutEmbed(){

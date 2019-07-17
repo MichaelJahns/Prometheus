@@ -14,3 +14,4 @@ Personal Discord Bot
 | assignNight  | Randomly picks one user from within the voice call to be the shot Caller, this is written to a db and cannot be reassigned same day. |
 | pickCaptains | Randomly picks two users from withing a voice call to be Team Captains.                                                              |
 ###### Note: all Routes are preceded by a prefix, default set to '-'
+
