@@ -61,9 +61,9 @@ bot.on("message", async msg => {
   if(command === `${prefix}adventure`){
     adventureStart(msg);
   }
-  else{
-    msg.channel.send(`${command} is not a known command. For a list of known commands, try <-about>`)
-  }
+  // else if{
+  //   msg.channel.send(`${command} is not a known command. For a list of known commands, try <-about>`)
+  // }
 })
 
 function broadcast(msg){
@@ -135,7 +135,7 @@ function pickCaptains(msg){
 // Night Assignment Functions
 //===========================
 function assignNight(msg){
-  // Return is sender is not an active participant
+  // Return is sender is not an active participant in the voice chat
   if(msg.member.voiceChannel === undefined){
     msg.channel.send(`You must be in a voice channel to use this command.`)
     return;
@@ -175,8 +175,11 @@ function collectContestants(voiceChannel){
   let contestants = [];
   for(let i = 0; i < applicants.length; i++){
     // Add if statement here to exclude bots from the contest
+    if(!applicants[i].user.bot){
+      console.log(i)
       let contestant = applicants[i].user.username;
       contestants.push(contestant);
+    }
   }
   return contestants;
 }
@@ -200,7 +203,7 @@ function writeNight(lottoWinner, date, msg){
 // Forced Clean UP
 //================
 async function cleanUpBotMessages(msg){
-  let history = getHistory(msg);
+  let history = await getHistory(msg);
   let deletedMessagesCount = 0;
   for(let msg of history){
     if(msg.author.bot){
@@ -214,7 +217,7 @@ async function cleanUpBotMessages(msg){
 async function getHistory(msg){
   let history = await msg.channel.fetchMessages({limit : 100});
   let historyArray = history.array();
-  return history;
+  return historyArray;
 }
 
 function getAboutEmbed(){
