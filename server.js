@@ -210,8 +210,12 @@ async function cleanUpBotMessages(msg){
       msg.delete();
       deletedMessagesCount++;
     }
+    if(msg.content.startsWith(prefix)){
+      msg.delete();
+      deletedMessagesCount++;
+    }
   }
-  msg.channel.send(`I have gone through the last 100 messages, and have deleted ${deletedMessagesCount} messages authored by bots.`)
+  msg.channel.send(`I have gone through the last 100 messages, and have deleted ${deletedMessagesCount} messages authored by bots or were directed to bots.`)
 }
 
 async function getHistory(msg){
