@@ -2,8 +2,10 @@ const Discord = require("discord.js");
 const firebase = require("firebase/app");
 const firestore = require("firebase/firestore");
 const { firebaseConfig } = require("./config.js");
+const { aboutEmbed, commandsEmbed } = require("./embeds.js");
 
 const bot = new Discord.Client();
+require("./util/eventLoader")(bot);
 const prefix = "-";
 
 bot.on("ready", async () => {
@@ -169,7 +171,6 @@ function createPositions(population) {
 // About Functions
 //================
 function aboutPrometheus(msg) {
-  const aboutEmbed = getAboutEmbed();
   msg.channel.send(aboutEmbed).then(() => {
     const filter = m => msg.author.id === m.author.id;
     msg.channel
@@ -177,7 +178,6 @@ function aboutPrometheus(msg) {
       .then(messages => {
         const response = messages.first().content;
         if (response === "commands") {
-          const commandsEmbed = getCommandsEmbed();
           msg.channel.send(commandsEmbed);
         } else {
           msg.channel.send(`Unrecognized input.`);
@@ -314,82 +314,5 @@ async function getHistory(msg) {
   return historyArray;
 }
 
-function getAboutEmbed() {
-  const aboutEmbed = new Discord.RichEmbed()
-    .setAuthor(
-      "Promethus",
-      "https://cdn.glitch.com/54870591-2d55-4c59-ad9f-3316b2eb0ac8%2FPrometheus_thumb.jpg?v=1562802583861",
-      "https://github.com/MichaelJahns/Prometheus"
-    )
-    .setTitle("About Prometheus")
-    .setDescription(
-      "Promethus is a personal discord bot that offers discord guilds meta-gaming utility"
-    )
-    .setColor("#E84515")
-    .setURL("https://github.com/MichaelJahns/Prometheus")
-    .setThumbnail(
-      "https://cdn.glitch.com/54870591-2d55-4c59-ad9f-3316b2eb0ac8%2FPrometheus_thumb.jpg?v=1562802583861"
-    )
-    .addBlankField()
-    .addField("Type 'commands'", "For a list of all available commands")
-    .addField(
-      "Promethus is listening...",
-      "Promehtus will stop listening for additional commands in 15 seconds."
-    )
-    .setTimestamp()
-    .setFooter("authored by Michael Jahns");
-  return aboutEmbed;
-}
-
-function getCommandsEmbed() {
-  const commandsEmbed = new Discord.RichEmbed()
-    .setAuthor(
-      "Promethus",
-      "https://cdn.glitch.com/54870591-2d55-4c59-ad9f-3316b2eb0ac8%2FPrometheus_thumb.jpg?v=1562802583861",
-      "https://github.com/MichaelJahns/Prometheus"
-    )
-    .setTitle("Prometheus")
-    .setDescription("All available commands")
-    .setColor("#E84515")
-    .setURL("https://github.com/MichaelJahns/Prometheus")
-    .setThumbnail(
-      "https://cdn.glitch.com/54870591-2d55-4c59-ad9f-3316b2eb0ac8%2FPrometheus_thumb.jpg?v=1562802583861"
-    )
-    .addField(
-      "-cleanUp",
-      "Removes all messages authored by bots in the last one hundred messages",
-      true
-    )
-    .addField(
-      "-assignNight",
-      "Picks a random user in the voice call to be the shotcaller for the night",
-      true
-    )
-    .addField(
-      "-pickCaptains",
-      "Picks two random users in a call to be team captains",
-      true
-    );
-
-  return commandsEmbed;
-}
-
 bot.login(process.env.DISCORD_BOT_TOKEN);
-
-// List of all available commands
-
-function test(msg) {
-  msg.channel.send(`Im listening for the word 'discord'`);
-  const filter = m => m.content.includes("discord");
-  const collector = msg.channel.createMessageCollector(filter, { time: 15000 });
-  collector.on("collect", m => {
-    console.log(`Collected ${m.content}`);
-  });
-
-  collector.on("end", collected => {
-    console.log(`Collected ${collected.size} items`);
-    for (let msg of collected) {
-      console.log(msg);
-    }
-  });
-}
+exports.bot = bot;
