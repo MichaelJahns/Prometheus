@@ -56,7 +56,7 @@ const commandsEmbed = new Discord.RichEmbed()
 const avalonEmbed = new Discord.RichEmbed()
   .setTitle("Avalon: the Resistance,")
   .setDescription(
-    "is a game of hidden loyalty. Players are either Loyal Servants of Arthur fighting for Goodness and Honor or aligned with the Evil ways of Modred. Every player in Voice Chat has been sent their role in the upcoming battle of wits. "
+    "is a game of hidden loyalty. Players are either Loyal Servants of Arthur fighting for Goodness and Honor or aligned with the Evil ways of Modred. Every player in Voice Chat has been sent their role for the upcoming battle of wits. "
   )
   .setColor("#FFC05A")
   .setURL("https://www.ultraboardgames.com/avalon/game-rules.php")

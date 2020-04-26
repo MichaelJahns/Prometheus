@@ -25,6 +25,7 @@ bot.on("ready", async () => {
     console.log(error);
   }
 });
+bot.login(process.env.DISCORD_BOT_TOKEN);
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
@@ -36,6 +37,7 @@ bot.on("message", async msg => {
 
   let splitMessage = msg.content.split(" ");
   let command = splitMessage[0];
+  let firstArgument = splitMessage[1];
 
   if (!command.startsWith(prefix)) return;
   else if (command === `${prefix}assignNight`) {
@@ -48,6 +50,12 @@ bot.on("message", async msg => {
     aboutPrometheus(msg);
   } else if (command === `${prefix}avalon`) {
     avalonStart(msg);
+  } else if (command === `${prefix}quest`) {
+    if (!firstArgument) {
+      msg.channel.send("This command needs a second argument.");
+    } else {
+      quest(msg, firstArgument);
+    }
   } else if (command === `${prefix}test`) {
     test(msg);
   } else {
@@ -85,8 +93,6 @@ function aboutPrometheus(msg) {
       });
   });
 }
-
-
 
 // Team Captain Functions
 //=======================
@@ -203,7 +209,7 @@ async function getHistory(msg) {
 const createGame = require("./game.js");
 const collectContestants = require("./tools/collectContestants.js");
 const randomNumberInRange = require("./tools/randomNumberInRange.js");
-const { avalonEmbed} = require("./embeds.js");
+const { avalonEmbed } = require("./embeds.js");
 
 function avalonStart(msg) {
   let contestants = collectContestants(msg.member.voiceChannel, msg);
@@ -231,8 +237,60 @@ function directMessageRole(contestant, role) {
       `In the coming battle of Wits you will represent, ${role.name}, a ${role.description}`
     );
   });
-} 
+}
 
-bot.login(process.env.DISCORD_BOT_TOKEN);
+function quest(msg, firstArgument) {
+  if (firstArgument > 5) {
+    msg.channel.send(
+      "The max quest size is 5, pleases select a smaller number"
+    );
+  } else if (firstArgument < 2) {
+    msg.channel.send(
+      "The minimum quest size is 2, please select a larger number"
+    );
+  } else {
+    let questMsg = `Wise King ${msg.author}, please choose your champions`;
+    msg.channel.send(questMsg).then(function(sentMessage) {
+      sentMessage
+        .react("1️⃣")
+        .then(() => sentMessage.react("2️⃣"))
+        .then(() => sentMessage.react("3️⃣"))
+        .then(() => sentMessage.react("4️⃣"))
+        .then(() => sentMessage.react("5️⃣"))
+        .then(() => sentMessage.react("6️⃣"))
+        .then(() => sentMessage.react("7️⃣"))
+        .then(() => sentMessage.react("8️⃣"))
+        .then(() => sentMessage.react("9️⃣"))
+        .then(() => sentMessage.react("🔟"))
+        .catch(() => console.error("emoji failed to react."));
+    });
+  }
+  const filter = (reaction, user) => {
+    return (
+      reaction.emoji.name === "1️⃣" &&
+      reaction.emoji.name === "2️⃣" &&
+      reaction.emoji.name === "3️⃣" &&
+      reaction.emoji.name === "4️⃣" &&
+      reaction.emoji.name === "5️⃣" &&
+      reaction.emoji.name === "6️⃣" &&
+      reaction.emoji.name === "7️⃣" &&
+      reaction.emoji.name === "8️⃣" &&
+      reaction.emoji.name === "9️⃣" &&
+      reaction.emoji.name === "🔟" &&
+      user.id === msg.author.id
+    );
+  };
 
+  //     const collector = msg.createReactionCollector(filter, { time: 15000 });
 
+  //     collector.on("collect", (reaction, reactionCollector) => {
+  //       console.log(`Collected ${reaction.emoji.name}`);
+  //     });
+
+  //     collector.on("end", collected => {
+  //       console.log(`Collected ${collected.size} items`);
+  //     });
+
+  //     msg.channel.send(firstArgument);
+  //   }
+}

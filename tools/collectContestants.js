@@ -1,5 +1,4 @@
 module.exports = function collectContestants(voiceChannel, msg) {
-  console.log('fart')
   try {
     let applicants = voiceChannel.members.array();
     let contestants = [];
