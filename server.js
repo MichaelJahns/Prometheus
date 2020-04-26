@@ -64,110 +64,6 @@ function broadcast(msg) {
   });
 }
 
-function avalonStart(msg) {
-  let contestants = collectContestants(msg.member.voiceChannel);
-  let positions = createPositions(contestants.length);
-  assignRoles(contestants, positions, msg);
-  msg.channel.send(`I think @MichorJay might be Merlin`);
-}
-
-function assignRoles(contestants, positions, msg) {
-  for (let i = contestants.length; i > 0; i--) {
-    console.log("Iteration " + i);
-    const randomNumber = randomNumberInRange(contestants.length);
-    const contestant = contestants.splice(randomNumber, 1);
-    const position = positions.pop();
-    console.log(contestant, position);
-    directMessageRole(contestant, position);
-  }
-}
-
-function directMessageRole(contestant, position) {
-  bot.fetchUser(contestant).then(user => {
-    user.send(`In the coming battle of Wits you will represent, ${position}`);
-  });
-}
-function createPositions(population) {
-  switch (population) {
-    case 1:
-      return ["Merlin"];
-      break;
-    case 2:
-      return ["Merlin", "Assassin"];
-      break;
-    case 5:
-      return [
-        "Merlin",
-        "Loyal Servant of Arthur",
-        "Loyal Servant of Arthur",
-        "Assassin",
-        "Minion of Mordred"
-      ];
-      break;
-    case 6:
-      return [
-        "Merlin",
-        "Loyal Servant of Arthur",
-        "Loyal Servant of Arthur",
-        "Loyal Servant of Arthur",
-        "Assassin",
-        "Minion of Mordred"
-      ];
-      break;
-    case 7:
-      return [
-        "Merlin",
-        "Loyal Servant of Arthur",
-        "Loyal Servant of Arthur",
-        "Loyal Servant of Arthur",
-        "Mordred",
-        "Assassin",
-        "Minion of Mordred"
-      ];
-      break;
-    case 8:
-      return [
-        "Merlin",
-        "Loyal Servant of Arthur",
-        "Loyal Servant of Arthur",
-        "Loyal Servant of Arthur",
-        "Loyal Servant of Arthur",
-        "Mordred",
-        "Assassin",
-        "Minion of Mordred"
-      ];
-      break;
-    case 9:
-      return [
-        "Merlin",
-        "Percival",
-        "Loyal Servant of Arthur",
-        "Loyal Servant of Arthur",
-        "Loyal Servant of Arthur",
-        "Loyal Servant of Arthur",
-        "Mordred",
-        "Assassin",
-        "Morgana"
-      ];
-      break;
-    case 10:
-      return [
-        "Merlin",
-        "Percival",
-        "Loyal Servant of Arthur",
-        "Loyal Servant of Arthur",
-        "Loyal Servant of Arthur",
-        "Loyal Servant of Arthur",
-        "Oberon",
-        "Mordred",
-        "Assassin",
-        "Morgana"
-      ];
-      break;
-    default:
-  }
-}
-
 // About Functions
 //================
 function aboutPrometheus(msg) {
@@ -189,6 +85,9 @@ function aboutPrometheus(msg) {
       });
   });
 }
+
+
+
 // Team Captain Functions
 //=======================
 function pickCaptains(msg) {
@@ -254,23 +153,6 @@ function assignNightRandomly(date, msg) {
   writeNight(lottoWinner, date, msg);
 }
 
-function collectContestants(voiceChannel) {
-  let applicants = voiceChannel.members.array();
-  let contestants = [];
-  for (let i = 0; i < applicants.length; i++) {
-    // Add if statement here to exclude bots from the contest
-    if (!applicants[i].user.bot) {
-      let contestant = applicants[i].user.id;
-      contestants.push(contestant);
-    }
-  }
-  return contestants;
-}
-
-function randomNumberInRange(range) {
-  return Math.floor(Math.random() * Math.floor(range));
-}
-
 function writeNight(lottoWinner, date, msg) {
   return db
     .collection("night")
@@ -314,5 +196,43 @@ async function getHistory(msg) {
   return historyArray;
 }
 
+///AVALON CODE
+//++++++++++++
+//I wanna abstract this to its own file but am having difficulties accessing bot commands in a seperate sheet
+
+const createGame = require("./game.js");
+const collectContestants = require("./tools/collectContestants.js");
+const randomNumberInRange = require("./tools/randomNumberInRange.js");
+const { avalonEmbed} = require("./embeds.js");
+
+function avalonStart(msg) {
+  let contestants = collectContestants(msg.member.voiceChannel, msg);
+  console.log(contestants);
+  let roles = createGame(contestants.length);
+  roles.forEach(character => {
+    console.log(character.name);
+  });
+  startGame(contestants, roles);
+  msg.channel.send(avalonEmbed);
+}
+
+function startGame(contestants, roles) {
+  for (let i = contestants.length; i > 0; i--) {
+    const randomNumber = randomNumberInRange(contestants.length);
+    const contestant = contestants.splice(randomNumber, 1);
+    const role = roles.pop();
+    directMessageRole(contestant, role);
+  }
+}
+
+function directMessageRole(contestant, role) {
+  bot.fetchUser(contestant).then(user => {
+    user.send(
+      `In the coming battle of Wits you will represent, ${role.name}, a ${role.description}`
+    );
+  });
+} 
+
 bot.login(process.env.DISCORD_BOT_TOKEN);
-exports.bot = bot;
+
+
