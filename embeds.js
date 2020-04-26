@@ -53,5 +53,29 @@ const commandsEmbed = new Discord.RichEmbed()
     true
   );
 
+const avalonEmbed = new Discord.RichEmbed()
+  .setTitle("Avalon: the Resistance,")
+  .setDescription(
+    "is a game of hidden loyalty. Players are either Loyal Servants of Arthur fighting for Goodness and Honor or aligned with the Evil ways of Modred. Every player in Voice Chat has been sent their role in the upcoming battle of wits. "
+  )
+  .setColor("#FFC05A")
+  .setURL("https://www.ultraboardgames.com/avalon/game-rules.php")
+  .setThumbnail(
+    "https://cdn.glitch.com/54870591-2d55-4c59-ad9f-3316b2eb0ac8%2Fholy-grail.png?v=1587850370330"
+  )
+  .addField(
+    "Objective",
+    "Good wins the game by successfully completeing three quests, Evils wins if three Quests end in failure. Evil can also win by assassinating Merlin at game's end or at any point during the game.",
+    true
+  )
+  .addField(
+    "Discussion",
+    "Players may make any claims during the game at any point in the game. Discussion, deception, accusation, and logical deduction are all equally important in order for Good to prevail or Evil to rule the day.",
+    true
+  )
+  .addBlankField()
+  .setFooter("Avalon designed by Don Eskridge");
+
 exports.aboutEmbed = aboutEmbed;
 exports.commandsEmbed = commandsEmbed;
+exports.avalonEmbed = avalonEmbed;
