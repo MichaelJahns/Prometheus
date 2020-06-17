@@ -54,7 +54,7 @@ bot.on("message", async msg => {
     if (!firstArgument) {
       msg.channel.send("This command needs a second argument.");
     } else {
-      quest(msg, firstArgument);
+      // quest(msg, firstArgument);
     }
   } else if (command === `${prefix}test`) {
     test(msg);
@@ -229,70 +229,52 @@ function startGame(contestants, roles) {
     const randomNumber = randomNumberInRange(contestants.length);
     const discordID = contestants.splice(randomNumber, 1).toString();
     const role = roles.pop();
-    writeAvalonians(discordID, role);
+    readAvalonians(discordID, role);
   }
 }
 
-class Avalonian {
-  constructor() {
-    this.Merlin = 0;
-    this.MinionOfModred = 0;
-    this.LoyalServantOfArthur = 0;
-    this.Assassin = 0;
-    this.Modred = 0;
-    this.Oberon = 0;
-    this.Morgana = 0;
-  }
-  toString() {
-    return this.Merlin + "Merlin";
-  }
-}
-
-const avalonianConverter = {
-  toFirestore: function(avalonian) {
-    return {
-      Merlin: avalonian.Merlin,
-      MinionOfModred: avalonian.Merlin,
-      LoyalServantOfArthur: avalonian.LoyalServantOfArthur,
-      Assassin: avalonian.Assassin,
-      Modred: avalonian.Modred,
-      Oberon: avalonian.Oberon,
-      Morgana: avalonian.Morgana
-    };
-  },
-  fromFirestore: function(snapshot, options) {
-    const data = snapshot.data(options);
-    return new Avalonian(
-      data.Merlin,
-      data.MinionOfModred,
-      data.LoyalServantOfArthur,
-      data.Assassin,
-      data.Mordred,
-      data.Oberon,
-      data.Morgana
-    );
-  }
-};
-
-function writeAvalonians(discordID, role, msg) {
-  var avalonianRef = db.collection("avalonians").doc(discordID);
-  const increment = firebase.firestore.FieldValue.increment(1);
-
-  avalonianRef
+function readAvalonians(discordID, role) {
+  db.collection("avalonians")
+    .doc(discordID)
     .get()
-    .then(function(doc) {
+    .then(doc => {
       if (doc.exists) {
-        console.log(doc.data());
+        let avalonian = doc.data();
+        updateAvalonianPlaycount(discordID, role, avalonian);
       } else {
-        // doc.data() will be undefined in this case
-        console.log("No such document!");
+        console.log("No such avalonian");
+        createAvalonian(discordID, role);
       }
     })
-    .then(() => {
-      directMessageAvalonRole(discordID, role);
-    })
-    .catch(function(err) {
-      console.log("Error getting document:", err);
+    .catch(error => {
+      console.log("Error" + error);
+    });
+}
+function createAvalonian(discordID, role) {
+  const avalonian = {
+    Merlin: 0
+  };
+  avalonian[role.name] = 1;
+  db.collection("avalonians")
+    .doc(discordID)
+    .set(avalonian)
+    .then(directMessageAvalonRole(discordID, role))
+    .catch(err => {
+      console.log("Error Creating Avalonian in fire store");
+      console.log(err);
+    });
+}
+
+function updateAvalonianPlaycount(discordID, role, avalonian) {
+  avalonian[role.name]++;
+
+  db.collection("avalonians")
+    .doc(discordID)
+    .set(avalonian)
+    .then(directMessageAvalonRole(discordID, role))
+    .catch(err => {
+      console.log("Error Creating Avalonian in fire store");
+      console.log(err);
     });
 }
 
