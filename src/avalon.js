@@ -1,3 +1,42 @@
+///AVALON CODE
+//++++++++++++
+//I wanna abstract this to its own file but am having difficulties accessing bot commands in a seperate sheet
+
+const createGame = require("./game.js");
+const collectContestants = require("../tools/collectContestants.js");
+const randomNumberInRange = require("../tools/randomNumberInRange.js");
+const { readAvalonians } = require("./firebase.js");
+const { avalonEmbed } = require("./embeds.js");
+
+function avalonStart(msg) {
+  let contestants = collectContestants(msg.member.voiceChannel, msg);
+  let roles = createGame(contestants.length);
+  // Catch roles as they are assigned
+  // Grab from db discord id or create new profile
+  // update map with current role
+  // Save to db
+  // send roles
+
+  startGame(contestants, roles);
+  msg.channel.send(avalonEmbed);
+}
+
+exports.avalonStart = avalonStart();
+
+function startGame(contestants, roles) {
+  for (let i = contestants.length; i > 0; i--) {
+    const randomNumber = randomNumberInRange(contestants.length);
+    const discordID = contestants.splice(randomNumber, 1).toString();
+    const role = roles.pop();
+    readAvalonians(discordID, role);
+  }
+} 
+
+
+
+
+
+
 // Code I hoped to turn into a quest command
 async function quest(msg, partySize) {
   let contestants = collectContestants(msg.member.voiceChannel, msg);

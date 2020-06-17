@@ -1,6 +1,6 @@
 const Discord = require("discord.js");
 
-const aboutEmbed = new Discord.RichEmbed()
+exports.aboutEmbed = new Discord.RichEmbed()
   .setAuthor(
     "Promethus",
     "https://cdn.glitch.com/54870591-2d55-4c59-ad9f-3316b2eb0ac8%2FPrometheus_thumb.jpg?v=1562802583861",
@@ -24,7 +24,7 @@ const aboutEmbed = new Discord.RichEmbed()
   .setTimestamp()
   .setFooter("authored by Michael Jahns");
 
-const commandsEmbed = new Discord.RichEmbed()
+exports.commandsEmbed = new Discord.RichEmbed()
   .setAuthor(
     "Promethus",
     "https://cdn.glitch.com/54870591-2d55-4c59-ad9f-3316b2eb0ac8%2FPrometheus_thumb.jpg?v=1562802583861",
@@ -53,7 +53,7 @@ const commandsEmbed = new Discord.RichEmbed()
     true
   );
 
-const avalonEmbed = new Discord.RichEmbed()
+exports.avalonEmbed = new Discord.RichEmbed()
   .setTitle("Avalon: the Resistance,")
   .setDescription(
     "is a game of hidden loyalty. Players are either Loyal Servants of Arthur fighting for Goodness and Honor or aligned with the Evil ways of Modred. Every player in Voice Chat has been sent their role for the upcoming battle of wits. "
@@ -73,10 +73,10 @@ const avalonEmbed = new Discord.RichEmbed()
     "Players may make any claims during the game at any point in the game. Discussion, deception, accusation, and logical deduction are all equally important in order for Good to prevail or Evil to rule the day.",
     true
   )
-	.setImage('https://cdn.glitch.com/54870591-2d55-4c59-ad9f-3316b2eb0ac8%2Fquest.png?v=1589768187704')
+  .setImage(
+    "https://cdn.glitch.com/54870591-2d55-4c59-ad9f-3316b2eb0ac8%2Fquest.png?v=1589768187704"
+  )
   .addBlankField()
   .setFooter("Avalon designed by Don Eskridge");
 
-exports.aboutEmbed = aboutEmbed;
-exports.commandsEmbed = commandsEmbed;
-exports.avalonEmbed = avalonEmbed;
+
