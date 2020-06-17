@@ -213,11 +213,13 @@ const { avalonEmbed } = require("./embeds.js");
 
 function avalonStart(msg) {
   let contestants = collectContestants(msg.member.voiceChannel, msg);
-  console.log(contestants);
   let roles = createGame(contestants.length);
-  roles.forEach(character => {
-    console.log(character.name);
-  });
+  // Catch roles as they are assigned
+  // Grab from db discord id or create new profile
+  // update map with current role
+  // Save to db
+  // send roles
+
   startGame(contestants, roles);
   msg.channel.send(avalonEmbed);
 }
@@ -225,99 +227,79 @@ function avalonStart(msg) {
 function startGame(contestants, roles) {
   for (let i = contestants.length; i > 0; i--) {
     const randomNumber = randomNumberInRange(contestants.length);
-    const contestant = contestants.splice(randomNumber, 1);
+    const discordID = contestants.splice(randomNumber, 1).toString();
     const role = roles.pop();
-    directMessageRole(contestant, role);
+    writeAvalonians(discordID, role);
   }
 }
 
-function directMessageRole(contestant, role) {
-  bot.fetchUser(contestant).then(user => {
+class Avalonian {
+  constructor() {
+    this.Merlin = 0;
+    this.MinionOfModred = 0;
+    this.LoyalServantOfArthur = 0;
+    this.Assassin = 0;
+    this.Modred = 0;
+    this.Oberon = 0;
+    this.Morgana = 0;
+  }
+  toString() {
+    return this.Merlin + "Merlin";
+  }
+}
+
+const avalonianConverter = {
+  toFirestore: function(avalonian) {
+    return {
+      Merlin: avalonian.Merlin,
+      MinionOfModred: avalonian.Merlin,
+      LoyalServantOfArthur: avalonian.LoyalServantOfArthur,
+      Assassin: avalonian.Assassin,
+      Modred: avalonian.Modred,
+      Oberon: avalonian.Oberon,
+      Morgana: avalonian.Morgana
+    };
+  },
+  fromFirestore: function(snapshot, options) {
+    const data = snapshot.data(options);
+    return new Avalonian(
+      data.Merlin,
+      data.MinionOfModred,
+      data.LoyalServantOfArthur,
+      data.Assassin,
+      data.Mordred,
+      data.Oberon,
+      data.Morgana
+    );
+  }
+};
+
+function writeAvalonians(discordID, role, msg) {
+  var avalonianRef = db.collection("avalonians").doc(discordID);
+  const increment = firebase.firestore.FieldValue.increment(1);
+
+  avalonianRef
+    .get()
+    .then(function(doc) {
+      if (doc.exists) {
+        console.log(doc.data());
+      } else {
+        // doc.data() will be undefined in this case
+        console.log("No such document!");
+      }
+    })
+    .then(() => {
+      directMessageAvalonRole(discordID, role);
+    })
+    .catch(function(err) {
+      console.log("Error getting document:", err);
+    });
+}
+
+function directMessageAvalonRole(discordID, role) {
+  bot.fetchUser(discordID).then(user => {
     user.send(
       `In the coming battle of Wits you will represent, ${role.name}, a ${role.description}`
     );
   });
-}
-
-const filter = (reaction, user) => {
-  return (
-    reaction.emoji.name === "1️⃣"
-    // ||
-    // reaction.emoji.name === "2️⃣" ||
-    // reaction.emoji.name === "3️⃣" ||
-    // reaction.emoji.name === "4️⃣" ||
-    // reaction.emoji.name === "5️⃣" ||
-    // reaction.emoji.name === "6️⃣" ||
-    // reaction.emoji.name === "7️⃣" ||
-    // reaction.emoji.name === "8️⃣" ||
-    // reaction.emoji.name === "9️⃣" ||
-    // reaction.emoji.name === "🔟"
-  );
-};
-
-async function quest(msg, partySize) {
-  let contestants = collectContestants(msg.member.voiceChannel, msg);
-  if (!contestants) {
-    return;
-  }
-
-  if (partySize > 5) {
-    msg.channel.send(
-      "The max quest size is 5, pleases select a smaller number"
-    );
-  } else if (partySize < 2) {
-    msg.channel.send(
-      "The minimum quest size is 2, please select a larger number"
-    );
-  } else {
-    let questMsg = `Wise King ${msg.author}, please choose your champions`;
-
-    msg.channel.send(questMsg).then(async function(sentMessage) {
-      if (contestants.length >= 5 || contestants.length === 1) {
-        await sentMessage.react("1️⃣");
-        await sentMessage.react("2️⃣");
-        await sentMessage.react("3️⃣");
-        await sentMessage.react("4️⃣");
-        await sentMessage.react("5️⃣");
-      }
-      if (contestants.length >= 6) {
-        await sentMessage.react("6️⃣");
-      }
-      if (contestants.length >= 7) {
-        await sentMessage.react("7️⃣");
-      }
-      if (contestants.length >= 8) {
-        await sentMessage.react("8️⃣");
-      }
-      if (contestants.length >= 9) {
-        await sentMessage.react("9️⃣");
-      }
-      if (contestants.length >= 10) {
-        await sentMessage.react("🔟");
-      }
-
-      await sentMessage
-        .awaitReactions(filter, {
-          max: partySize,
-          time: 10000,
-          errors: ["time"]
-        })
-        .then(collected => console.log(collected))
-        .catch(collected => {
-          const humans = collected.partition(u => !u.bot);
-
-          const collector = sentMessage.createReactionCollector(filter, {
-            time: 10000
-          });
-
-          collector.on("collect", (reaction, reactionCollector) => {
-            console.log(`Collected ${reaction.emoji.name}`);
-          });
-
-          collector.on("end", collected => {
-            console.log(`Collected ${collected.size} items`);
-          });
-        });
-    });
-  }
 }
