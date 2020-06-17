@@ -25,6 +25,7 @@ bot.on("ready", async () => {
     console.log(error);
   }
 });
+bot.login(process.env.DISCORD_BOT_TOKEN);
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
@@ -36,6 +37,7 @@ bot.on("message", async msg => {
 
   let splitMessage = msg.content.split(" ");
   let command = splitMessage[0];
+  let firstArgument = splitMessage[1];
 
   if (!command.startsWith(prefix)) return;
   else if (command === `${prefix}assignNight`) {
@@ -48,6 +50,12 @@ bot.on("message", async msg => {
     aboutPrometheus(msg);
   } else if (command === `${prefix}avalon`) {
     avalonStart(msg);
+  } else if (command === `${prefix}quest`) {
+    if (!firstArgument) {
+      msg.channel.send("This command needs a second argument.");
+    } else {
+      // quest(msg, firstArgument);
+    }
   } else if (command === `${prefix}test`) {
     test(msg);
   } else {
@@ -85,8 +93,6 @@ function aboutPrometheus(msg) {
       });
   });
 }
-
-
 
 // Team Captain Functions
 //=======================
@@ -203,15 +209,17 @@ async function getHistory(msg) {
 const createGame = require("./game.js");
 const collectContestants = require("./tools/collectContestants.js");
 const randomNumberInRange = require("./tools/randomNumberInRange.js");
-const { avalonEmbed} = require("./embeds.js");
+const { avalonEmbed } = require("./embeds.js");
 
 function avalonStart(msg) {
   let contestants = collectContestants(msg.member.voiceChannel, msg);
-  console.log(contestants);
   let roles = createGame(contestants.length);
-  roles.forEach(character => {
-    console.log(character.name);
-  });
+  // Catch roles as they are assigned
+  // Grab from db discord id or create new profile
+  // update map with current role
+  // Save to db
+  // send roles
+
   startGame(contestants, roles);
   msg.channel.send(avalonEmbed);
 }
@@ -219,20 +227,61 @@ function avalonStart(msg) {
 function startGame(contestants, roles) {
   for (let i = contestants.length; i > 0; i--) {
     const randomNumber = randomNumberInRange(contestants.length);
-    const contestant = contestants.splice(randomNumber, 1);
+    const discordID = contestants.splice(randomNumber, 1).toString();
     const role = roles.pop();
-    directMessageRole(contestant, role);
+    readAvalonians(discordID, role);
   }
 }
 
-function directMessageRole(contestant, role) {
-  bot.fetchUser(contestant).then(user => {
+function readAvalonians(discordID, role) {
+  db.collection("avalonians")
+    .doc(discordID)
+    .get()
+    .then(doc => {
+      if (doc.exists) {
+        let avalonian = doc.data();
+        updateAvalonianPlaycount(discordID, role, avalonian);
+      } else {
+        console.log("No such avalonian");
+        createAvalonian(discordID, role);
+      }
+    })
+    .catch(error => {
+      console.log("Error" + error);
+    });
+}
+function createAvalonian(discordID, role) {
+  const avalonian = {
+    Merlin: 0
+  };
+  avalonian[role.name] = 1;
+  db.collection("avalonians")
+    .doc(discordID)
+    .set(avalonian)
+    .then(directMessageAvalonRole(discordID, role))
+    .catch(err => {
+      console.log("Error Creating Avalonian in fire store");
+      console.log(err);
+    });
+}
+
+function updateAvalonianPlaycount(discordID, role, avalonian) {
+  avalonian[role.name]++;
+
+  db.collection("avalonians")
+    .doc(discordID)
+    .set(avalonian)
+    .then(directMessageAvalonRole(discordID, role))
+    .catch(err => {
+      console.log("Error Creating Avalonian in fire store");
+      console.log(err);
+    });
+}
+
+function directMessageAvalonRole(discordID, role) {
+  bot.fetchUser(discordID).then(user => {
     user.send(
       `In the coming battle of Wits you will represent, ${role.name}, a ${role.description}`
     );
   });
-} 
-
-bot.login(process.env.DISCORD_BOT_TOKEN);
-
-
+}
