@@ -202,8 +202,8 @@ const { avalonEmbed } = require("./embeds.js");
 function avalonStart(msg) {
   let contestants = collectContestants(msg.member.voiceChannel, msg);
   let playerCount = contestants.length;
-  console.log(playerCount)
   let roles = createGame(contestants.length);
+  sendAvalonEmbed(playerCount, roles, msg);
   // Catch roles as they are assigned
   // Grab from db discord id or create new profile
   // update map with current role
@@ -211,14 +211,17 @@ function avalonStart(msg) {
   // send roles
 
   startGame(contestants, roles);
-  sendAvalonEmbed(playerCount, roles, msg);
 }
 
 function sendAvalonEmbed(playerCount, roles, msg) {
   let embed = avalonEmbed
+  console.log()
   switch (playerCount) {
     case 1:
       embed.setImage('https://cdn.glitch.com/54870591-2d55-4c59-ad9f-3316b2eb0ac8%2Fquest.png?v=1589768187704');
+      embed.addField(
+        'Characters',
+        `In a ${playerCount} player game, the roles are ${roleArrayToString(roles)}`);
       break;
     case 5:
       embed.setImage('https://cdn.glitch.com/54870591-2d55-4c59-ad9f-3316b2eb0ac8%2Favalon5.jpg?v=1592487784371');
@@ -238,9 +241,22 @@ function sendAvalonEmbed(playerCount, roles, msg) {
     default:
       msg.channel.send("Inoperable number of players")
   }
-  embed.setFooter(roles)
   msg.channel.send(embed);
 }
+
+function roleArrayToString(roles) {
+  let roleString = "";
+  for (let i = 0; i < roles.length; i++) {
+    roleString += roles[i].name + ", ";
+    if (i !== roles.length - 1) {
+      roleString += ", "
+    } else {
+      roleString += "."
+    }
+  }
+  return roleString;
+}
+
 function startGame(contestants, roles) {
   for (let i = contestants.length; i > 0; i--) {
     const randomNumber = randomNumberInRange(contestants.length);
