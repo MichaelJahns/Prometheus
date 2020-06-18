@@ -60,13 +60,6 @@ bot.on("message", async msg => {
   }
 });
 
-function broadcast(msg) {
-  msg.channel.send("My message to react to.").then(sentMessage => {
-    sentMessage.react("👍");
-    sentMessage.react("<emoji id>");
-  });
-}
-
 // About Functions
 //================
 function aboutPrometheus(msg) {
@@ -202,12 +195,14 @@ async function getHistory(msg) {
 //I wanna abstract this to its own file but am having difficulties accessing bot commands in a seperate sheet
 
 const createGame = require("./game.js");
-const collectContestants = require("./tools/collectContestants.js");
-const randomNumberInRange = require("./tools/randomNumberInRange.js");
+const collectContestants = require("./tools/channelCommands.js");
+const randomNumberInRange = require("./tools/tools.js");
 const { avalonEmbed } = require("./embeds.js");
 
 function avalonStart(msg) {
   let contestants = collectContestants(msg.member.voiceChannel, msg);
+  let playerCount = contestants.length;
+  console.log(playerCount)
   let roles = createGame(contestants.length);
   // Catch roles as they are assigned
   // Grab from db discord id or create new profile
@@ -216,32 +211,35 @@ function avalonStart(msg) {
   // send roles
 
   startGame(contestants, roles);
-  sendAvalonEmbed(contestants.length, roles);
+  sendAvalonEmbed(playerCount, roles, msg);
 }
 
-function sendAvalonEmbed(playerCount, roles) {
+function sendAvalonEmbed(playerCount, roles, msg) {
+  let embed = avalonEmbed
   switch (playerCount) {
     case 1:
-      avalonEmbed.setImage('https://cdn.glitch.com/54870591-2d55-4c59-ad9f-3316b2eb0ac8%2Fholy-grail.png?v=1587850370330');
+      embed.setImage('https://cdn.glitch.com/54870591-2d55-4c59-ad9f-3316b2eb0ac8%2Fquest.png?v=1589768187704');
+      break;
     case 5:
-      avalonEmbed.setImage('https://cdn.glitch.com/54870591-2d55-4c59-ad9f-3316b2eb0ac8%2Favalon5.jpg?v=1592487784371');
+      embed.setImage('https://cdn.glitch.com/54870591-2d55-4c59-ad9f-3316b2eb0ac8%2Favalon5.jpg?v=1592487784371');
       break;
     case 6:
-      avalonEmbed.setImage('https://cdn.glitch.com/54870591-2d55-4c59-ad9f-3316b2eb0ac8%2Favalon6.jpg?v=1592487764875');
+      embed.setImage('https://cdn.glitch.com/54870591-2d55-4c59-ad9f-3316b2eb0ac8%2Favalon6.jpg?v=1592487764875');
       break;
     case 7:
-      avalonEmbed.setImage('https://cdn.glitch.com/54870591-2d55-4c59-ad9f-3316b2eb0ac8%2Favalon7.jpg?v=1592487762808');
+      embed.setImage('https://cdn.glitch.com/54870591-2d55-4c59-ad9f-3316b2eb0ac8%2Favalon7.jpg?v=1592487762808');
       break;
     case 8:
-      avalonEmbed.setImage('https://cdn.glitch.com/54870591-2d55-4c59-ad9f-3316b2eb0ac8%2Favalon8.jpg?v=1592487760344');
+      embed.setImage('https://cdn.glitch.com/54870591-2d55-4c59-ad9f-3316b2eb0ac8%2Favalon8.jpg?v=1592487760344');
       break;
     case 9:
-      avalonEmbed.setImage('https://cdn.glitch.com/54870591-2d55-4c59-ad9f-3316b2eb0ac8%2Favalon10.jpg?v=1592487755846');
+      embed.setImage('https://cdn.glitch.com/54870591-2d55-4c59-ad9f-3316b2eb0ac8%2Favalon10.jpg?v=1592487755846');
       break;
     default:
-    // Im not sure what to put here.
+      msg.channel.send("Inoperable number of players")
   }
-  msg.channel.send(avalonEmbed);
+  embed.setFooter(roles)
+  msg.channel.send(embed);
 }
 function startGame(contestants, roles) {
   for (let i = contestants.length; i > 0; i--) {
