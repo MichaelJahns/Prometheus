@@ -1,10 +1,11 @@
-const { firebaseConfig } = require("./config.js");
-
 const Discord = require("discord.js");
 const firebase = require("firebase/app");
 const firestore = require("firebase/firestore");
+const { firebaseConfig } = require("./config.js");
 const { aboutEmbed, commandsEmbed } = require("./embeds.js");
+
 const bot = new Discord.Client();
+require("./util/eventLoader")(bot);
 const prefix = "-";
 
 bot.on("ready", async () => {
@@ -24,11 +25,9 @@ bot.on("ready", async () => {
     console.log(error);
   }
 });
-
-  bot.login(process.env.DISCORD_BOT_TOKEN);
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
-
+bot.login(process.env.DISCORD_BOT_TOKEN);
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
 // listen for commands
 
@@ -261,7 +260,7 @@ function createAvalonian(discordID, role) {
     .set(avalonian)
     .then(directMessageAvalonRole(discordID, role))
     .catch(err => {
-      console.log("Error Creating Avalonian in firestore");
+      console.log("Error Creating Avalonian in fire store");
       console.log(err);
     });
 }
@@ -274,7 +273,7 @@ function updateAvalonianPlaycount(discordID, role, avalonian) {
     .set(avalonian)
     .then(directMessageAvalonRole(discordID, role))
     .catch(err => {
-      console.log("Error Updating Avalonian in firestore");
+      console.log("Error Creating Avalonian in fire store");
       console.log(err);
     });
 }

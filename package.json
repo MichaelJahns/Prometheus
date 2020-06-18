@@ -6,10 +6,9 @@
     "start": "node server.js"
   },
   "dependencies": {
-    "@firebase/firestore": "^1.15.1",
     "discord.js": "^11.5.1",
-    "dotenv": "^8.2.0",
-    "firebase": "^6.1.0"
+    "firebase": "^6.1.0",
+    "@firebase/firestore": "^1.4.3"
   },
   "engines": {
     "node": "8.x"
