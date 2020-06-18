@@ -1,13 +1,13 @@
 module.exports = function createGame(playerCount) {
   switch (playerCount) {
     case 1:
-      return [Merlin];
+      return [Developer];
       break;
     case 2:
       return [Merlin, Assassin];
       break;
     // The minimum number of players is five, the above cases are only here for debugging purposes
-          case 5:
+    case 5:
       return [
         Merlin,
         Servant,
@@ -111,4 +111,9 @@ const Oberon = {
 const Morgana = {
   name: "Morgana",
   description: "powerful enchantress who serves Morded, Morgana's special power is the ability to confuse Percival at the start of the game. Using Morgana deception wisely can lead Good to question their own."
+}
+
+const Developer = {
+  name: "Developer",
+  description: "Michael Jahns, a real rad guy, check out his work at https://github.com/MichaelJahns"
 }

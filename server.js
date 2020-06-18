@@ -36,10 +36,24 @@ bot.on("message", async msg => {
   if (msg.channel.type === "dm") return;
 
   let splitMessage = msg.content.split(" ");
+  let s;
   let command = splitMessage[0];
   let firstArgument = splitMessage[1];
 
   if (!command.startsWith(prefix)) return;
+
+  // switch (command) {
+  //   case `${prefix}assignNight`:
+  //     // code block
+  //     break;
+  //   case y:
+  //     // code block
+  //     break;
+  //   default:
+  //   // code block
+  // }
+
+
   else if (command === `${prefix}assignNight`) {
     assignNight(msg);
   } else if (command === `${prefix}pickCaptains`) {
@@ -132,7 +146,7 @@ function isNightOwned(date, msg) {
     .collection("night")
     .doc(date)
     .get()
-    .then(function(doc) {
+    .then(function (doc) {
       if (doc.exists) {
         // Night is already owned, the dice will not roll again
         msg.channel.send(
@@ -144,7 +158,7 @@ function isNightOwned(date, msg) {
         assignNightRandomly(date, msg);
       }
     })
-    .catch(function(error) {
+    .catch(function (error) {
       console.log("Error getting document" + error);
     });
 }
@@ -166,11 +180,11 @@ function writeNight(lottoWinner, date, msg) {
     .set({
       nightOwner: lottoWinner
     })
-    .then(function(docRef) {
+    .then(function (docRef) {
       msg.channel.send(`Let tonight be ${lottoWinner}'s night.`);
       console.log(`Night Owner ${lottoWinner} written to firestore`);
     })
-    .catch(function(error) {
+    .catch(function (error) {
       msg.channel.send(`Failed to assign night..`);
       console.log(`Failure to write ${lottoWinner} to firestore`);
     });
@@ -221,9 +235,33 @@ function avalonStart(msg) {
   // send roles
 
   startGame(contestants, roles);
-  msg.channel.send(avalonEmbed);
+  sendAvalonEmbed(contestants.length, roles);
 }
 
+function sendAvalonEmbed(playerCount, roles) {
+  switch (playerCount) {
+    case 1:
+      avalonEmbed.setImage('https://cdn.glitch.com/54870591-2d55-4c59-ad9f-3316b2eb0ac8%2Fholy-grail.png?v=1587850370330');
+    case 5:
+      avalonEmbed.setImage('https://cdn.glitch.com/54870591-2d55-4c59-ad9f-3316b2eb0ac8%2Favalon5.jpg?v=1592487784371');
+      break;
+    case 6:
+      avalonEmbed.setImage('https://cdn.glitch.com/54870591-2d55-4c59-ad9f-3316b2eb0ac8%2Favalon6.jpg?v=1592487764875');
+      break;
+    case 7:
+      avalonEmbed.setImage('https://cdn.glitch.com/54870591-2d55-4c59-ad9f-3316b2eb0ac8%2Favalon7.jpg?v=1592487762808');
+      break;
+    case 8:
+      avalonEmbed.setImage('https://cdn.glitch.com/54870591-2d55-4c59-ad9f-3316b2eb0ac8%2Favalon8.jpg?v=1592487760344');
+      break;
+    case 9:
+      avalonEmbed.setImage('https://cdn.glitch.com/54870591-2d55-4c59-ad9f-3316b2eb0ac8%2Favalon10.jpg?v=1592487755846');
+      break;
+    default:
+    // Im not sure what to put here.
+  }
+  msg.channel.send(avalonEmbed);
+}
 function startGame(contestants, roles) {
   for (let i = contestants.length; i > 0; i--) {
     const randomNumber = randomNumberInRange(contestants.length);
@@ -266,7 +304,11 @@ function createAvalonian(discordID, role) {
 }
 
 function updateAvalonianPlaycount(discordID, role, avalonian) {
-  avalonian[role.name]++;
+  if (!avalonian[role.name]) {
+    avalonian[role.name] = 1
+  } else {
+    avalonian[role.name]++;
+  }
 
   db.collection("avalonians")
     .doc(discordID)
