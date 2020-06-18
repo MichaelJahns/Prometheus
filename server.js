@@ -37,40 +37,28 @@ bot.on("message", async msg => {
 
   let splitMessage = msg.content.split(" ");
   let command = splitMessage[0];
-  let firstArgument = splitMessage[1];
 
   if (!command.startsWith(prefix)) return;
-  else if (command === `${prefix}assignNight`) {
-    assignNight(msg);
-  } else if (command === `${prefix}pickCaptains`) {
-    pickCaptains(msg);
-  } else if (command === `${prefix}cleanUp`) {
-    cleanUpBotMessages(msg);
-  } else if (command === `${prefix}about`) {
-    aboutPrometheus(msg);
-  } else if (command === `${prefix}avalon`) {
-    avalonStart(msg);
-  } else if (command === `${prefix}quest`) {
-    if (!firstArgument) {
-      msg.channel.send("This command needs a second argument.");
-    } else {
-      // quest(msg, firstArgument);
-    }
-  } else if (command === `${prefix}test`) {
-    test(msg);
-  } else {
-    msg.channel.send(
+  switch (command) {
+    case `${prefix}assignNight`:
+      assignNight(msg);
+      break;
+    case `${prefix}pickCaptains`:
+      pickCaptains(msg);
+      break;
+    case `${prefix}cleanUp`:
+      cleanUpBotMessages(msg);
+      break;
+    case `${prefix}about`:
+      aboutPrometheus(msg);
+      break;
+    case `${prefix}avalon`:
+      avalonStart(msg);
+      break;
+    default:
       `${command} is not a known command. For a list of known commands, try <-about>`
-    );
   }
 });
-
-function broadcast(msg) {
-  msg.channel.send("My message to react to.").then(sentMessage => {
-    sentMessage.react("👍");
-    sentMessage.react("<emoji id>");
-  });
-}
 
 // About Functions
 //================
@@ -132,7 +120,7 @@ function isNightOwned(date, msg) {
     .collection("night")
     .doc(date)
     .get()
-    .then(function(doc) {
+    .then(function (doc) {
       if (doc.exists) {
         // Night is already owned, the dice will not roll again
         msg.channel.send(
@@ -144,7 +132,7 @@ function isNightOwned(date, msg) {
         assignNightRandomly(date, msg);
       }
     })
-    .catch(function(error) {
+    .catch(function (error) {
       console.log("Error getting document" + error);
     });
 }
@@ -166,11 +154,11 @@ function writeNight(lottoWinner, date, msg) {
     .set({
       nightOwner: lottoWinner
     })
-    .then(function(docRef) {
+    .then(function (docRef) {
       msg.channel.send(`Let tonight be ${lottoWinner}'s night.`);
       console.log(`Night Owner ${lottoWinner} written to firestore`);
     })
-    .catch(function(error) {
+    .catch(function (error) {
       msg.channel.send(`Failed to assign night..`);
       console.log(`Failure to write ${lottoWinner} to firestore`);
     });
@@ -207,13 +195,15 @@ async function getHistory(msg) {
 //I wanna abstract this to its own file but am having difficulties accessing bot commands in a seperate sheet
 
 const createGame = require("./game.js");
-const collectContestants = require("./tools/collectContestants.js");
-const randomNumberInRange = require("./tools/randomNumberInRange.js");
+const collectContestants = require("./tools/channelCommands.js");
+const randomNumberInRange = require("./tools/tools.js");
 const { avalonEmbed } = require("./embeds.js");
 
 function avalonStart(msg) {
   let contestants = collectContestants(msg.member.voiceChannel, msg);
+  let playerCount = contestants.length;
   let roles = createGame(contestants.length);
+  sendAvalonEmbed(playerCount, roles, msg);
   // Catch roles as they are assigned
   // Grab from db discord id or create new profile
   // update map with current role
@@ -221,7 +211,50 @@ function avalonStart(msg) {
   // send roles
 
   startGame(contestants, roles);
-  msg.channel.send(avalonEmbed);
+}
+
+function sendAvalonEmbed(playerCount, roles, msg) {
+  let embed = avalonEmbed
+  console.log()
+  switch (playerCount) {
+    case 1:
+      embed.setImage('https://cdn.glitch.com/54870591-2d55-4c59-ad9f-3316b2eb0ac8%2Fquest.png?v=1589768187704');
+      embed.addField(
+        'Characters',
+        `In a ${playerCount} player game, the roles are ${roleArrayToString(roles)}`);
+      break;
+    case 5:
+      embed.setImage('https://cdn.glitch.com/54870591-2d55-4c59-ad9f-3316b2eb0ac8%2Favalon5.jpg?v=1592487784371');
+      break;
+    case 6:
+      embed.setImage('https://cdn.glitch.com/54870591-2d55-4c59-ad9f-3316b2eb0ac8%2Favalon6.jpg?v=1592487764875');
+      break;
+    case 7:
+      embed.setImage('https://cdn.glitch.com/54870591-2d55-4c59-ad9f-3316b2eb0ac8%2Favalon7.jpg?v=1592487762808');
+      break;
+    case 8:
+      embed.setImage('https://cdn.glitch.com/54870591-2d55-4c59-ad9f-3316b2eb0ac8%2Favalon8.jpg?v=1592487760344');
+      break;
+    case 9:
+      embed.setImage('https://cdn.glitch.com/54870591-2d55-4c59-ad9f-3316b2eb0ac8%2Favalon10.jpg?v=1592487755846');
+      break;
+    default:
+      msg.channel.send("Inoperable number of players")
+  }
+  msg.channel.send(embed);
+}
+
+function roleArrayToString(roles) {
+  let roleString = "";
+  for (let i = 0; i < roles.length; i++) {
+    roleString += roles[i].name + ", ";
+    if (i !== roles.length - 1) {
+      roleString += ", "
+    } else {
+      roleString += "."
+    }
+  }
+  return roleString;
 }
 
 function startGame(contestants, roles) {
@@ -266,7 +299,11 @@ function createAvalonian(discordID, role) {
 }
 
 function updateAvalonianPlaycount(discordID, role, avalonian) {
-  avalonian[role.name]++;
+  if (!avalonian[role.name]) {
+    avalonian[role.name] = 1
+  } else {
+    avalonian[role.name]++;
+  }
 
   db.collection("avalonians")
     .doc(discordID)

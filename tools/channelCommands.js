@@ -17,3 +17,5 @@ module.exports = function collectContestants(voiceChannel, msg) {
     );
   }
 }
+
+exports.collectContestants = this.collectContestants;

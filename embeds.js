@@ -73,7 +73,6 @@ const avalonEmbed = new Discord.RichEmbed()
     "Players may make any claims during the game at any point in the game. Discussion, deception, accusation, and logical deduction are all equally important in order for Good to prevail or Evil to rule the day.",
     true
   )
-	.setImage('https://cdn.glitch.com/54870591-2d55-4c59-ad9f-3316b2eb0ac8%2Fquest.png?v=1589768187704')
   .addBlankField()
   .setFooter("Avalon designed by Don Eskridge");
 
