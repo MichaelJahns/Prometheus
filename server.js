@@ -36,46 +36,27 @@ bot.on("message", async msg => {
   if (msg.channel.type === "dm") return;
 
   let splitMessage = msg.content.split(" ");
-  let s;
   let command = splitMessage[0];
-  let firstArgument = splitMessage[1];
 
   if (!command.startsWith(prefix)) return;
-
-  // switch (command) {
-  //   case `${prefix}assignNight`:
-  //     // code block
-  //     break;
-  //   case y:
-  //     // code block
-  //     break;
-  //   default:
-  //   // code block
-  // }
-
-
-  else if (command === `${prefix}assignNight`) {
-    assignNight(msg);
-  } else if (command === `${prefix}pickCaptains`) {
-    pickCaptains(msg);
-  } else if (command === `${prefix}cleanUp`) {
-    cleanUpBotMessages(msg);
-  } else if (command === `${prefix}about`) {
-    aboutPrometheus(msg);
-  } else if (command === `${prefix}avalon`) {
-    avalonStart(msg);
-  } else if (command === `${prefix}quest`) {
-    if (!firstArgument) {
-      msg.channel.send("This command needs a second argument.");
-    } else {
-      // quest(msg, firstArgument);
-    }
-  } else if (command === `${prefix}test`) {
-    test(msg);
-  } else {
-    msg.channel.send(
+  switch (command) {
+    case `${prefix}assignNight`:
+      assignNight(msg);
+      break;
+    case `${prefix}pickCaptains`:
+      pickCaptains(msg);
+      break;
+    case `${prefix}cleanUp`:
+      cleanUpBotMessages(msg);
+      break;
+    case `${prefix}about`:
+      aboutPrometheus(msg);
+      break;
+    case `${prefix}avalon`:
+      avalonStart(msg);
+      break;
+    default:
       `${command} is not a known command. For a list of known commands, try <-about>`
-    );
   }
 });
 
