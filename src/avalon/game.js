@@ -4,7 +4,7 @@ module.exports = function createGame(playerCount) {
       return [Developer];
       break;
     case 2:
-      return [Merlin, Assassin];
+      return [Developer, Developer];
       break;
     // The minimum number of players is five, the above cases are only here for debugging purposes
     case 5:
