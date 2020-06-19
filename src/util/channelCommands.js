@@ -34,7 +34,6 @@ async function cleanUpBotMessages(msg) {
   }
   msg.channel.send(`In the last 100 messages there are ${deletedMessagesCount} messages authored by bots. I am beggining to remove them.`);
 }
-on
 // This wasnt working so i abstracted it out of the core functionality above and hope to troubleshoot it in the future                                     
 // async function cleanUpMessagesToBots(msg, prefix){
 //   let history = await getHistory(msg);
@@ -54,5 +53,10 @@ async function getHistory(msg) {
   return historyArray;
 }
 
+function sendChannelEmbed(msg, embed){
+  msg.channel.send(embed)
+}
+
+module.exports.sendChannelEmbed = sendChannelEmbed;
 module.exports.collectVoiceChatParticipantIDs = collectVoiceChatParticipantIDs;
 module.exports.cleanChat = cleanChat;

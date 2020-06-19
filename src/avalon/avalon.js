@@ -1,5 +1,5 @@
 const getAvalonRoles = require("./gameState");
-const { collectVoiceChatParticipantIDs } = require("../util/channelCommands")
+const { collectVoiceChatParticipantIDs, sendChannelEmbed } = require("../util/channelCommands")
 const { randomNumberInRange }= require("../util/tools");
 const { readAvalonian } = require("../firebase/firestoreFunctions")
 const { buildAvalonEmbed } = require("../ui/avalonEmbed")
@@ -9,8 +9,9 @@ function avalon(msg) {
   let contestants = collectVoiceChatParticipantIDs(msg);
   let playerCount = contestants.length;
   let roles = getAvalonRoles(playerCount)
-  const embed = buildAvalonEmbed(playerCount, roles, msg);
+  const avalonEmbed = buildAvalonEmbed(playerCount, roles, msg);
   assignRolesToContestants(contestants, roles);
+  sendChannelEmbed(msg, avalonEmbed);
 }
 
 function assignRolesToContestants(contestants, roles) {
