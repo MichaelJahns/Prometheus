@@ -1,4 +1,5 @@
 module.exports = function collectVoiceChatParticipantIDs(msg) {
+  console.log("SUCCESS AT LAST")
   const voiceChannel = msg.member.voiceChannel;
   try {
     let applicants = voiceChannel.members.array();

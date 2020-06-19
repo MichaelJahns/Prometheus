@@ -3,14 +3,12 @@
 //I wanna abstract this to its own file but am having difficulties accessing bot commands in a seperate sheet
 
 const createGame = require("./game.js");
-const { collectVoiceChatParticipantIDs } = require("../util/channelCommands.js");
+const collectVoiceChatParticipantIDs = require("../util/channelCommands.js");
 const randomNumberInRange = require("../util/tools.js");
 
 module.exports = function avalon(msg) {
-  console.log("SUCCESS AT LAST")
   let contestants = collectVoiceChatParticipantIDs(msg);
-  // console.log(contestants);
-  // let playerCount = contestants.length;
+   // let playerCount = contestants.length;
   // let roles = createGame(contestants.length);
   // console.log(roles)
   // const embed = buildAvalonEmbed(playerCount, roles, msg);
