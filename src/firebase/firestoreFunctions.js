@@ -52,6 +52,7 @@ function readAvalonian(discordID, role) {
       });
   }
 
+module.exports.db = db;
 module.exports.readAvalonian = readAvalonian;
 module.exports.createAvalonian = createAvalonian;
 module.exports.updateAvalonian = updateAvalonian;

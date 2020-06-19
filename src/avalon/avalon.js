@@ -26,6 +26,7 @@ function assignRolesToContestants(contestants, roles) {
 
 function directMessageAvalonRole(discordID, role) {
   bot.fetchUser(discordID).then(user => {
+    console.log(user)
     user.send(
       `In the coming battle of Wits you will represent, ${role.name}, a ${role.description}`
     );
