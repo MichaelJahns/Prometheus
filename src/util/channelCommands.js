@@ -19,11 +19,7 @@ function collectVoiceChatParticipantIDs(msg) {
     );
   }
 }
- 
-function randomNumberInRange(range) {
-  return Math.floor(Math.random() * Math.floor(range));
-}
-
+ 0
 async function cleanChat(msg, prefix){
   cleanUpBotMessages(msg);
   cleanUpMessagesToBots(msg, prefix);
@@ -59,6 +55,5 @@ async function getHistory(msg) {
   return historyArray;
 }
 
-module.exports.xyz = collectVoiceChatParticipantIDs;
-module.exports.randomNumberInRange = randomNumberInRange;
+module.exports.collectVoiceChatParticipantIDs = collectVoiceChatParticipantIDs;
 module.exports.cleanChat = cleanChat;

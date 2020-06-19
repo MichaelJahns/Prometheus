@@ -10,4 +10,10 @@ function roleArrayToString(roles) {
     }
     return roleString;
   }
+
+  function randomNumberInRange(range) {
+    return Math.floor(Math.random() * Math.floor(range));
+  }
+
+module.exports.randomNumberInRange = randomNumberInRange;
 module.exports.roleArrayToString = roleArrayToString;

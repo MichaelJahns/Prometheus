@@ -3,11 +3,11 @@
 //I wanna abstract this to its own file but am having difficulties accessing bot commands in a seperate sheet
 
 const getAvalonRoles = require("./gameState.js");
-const {xyz} = require("../util/channelCommands")
+const { collectVoiceChatParticipantIDs } = require("../util/channelCommands")
 const { randomNumberInRange }= require("../util/tools.js");
 
 function avalon(msg) {
-  let contestants = xyz(msg);
+  let contestants = collectVoiceChatParticipantIDs(msg);
   console.log(contestants)
   let playerCount = contestants.length;
   let roles = getAvalonRoles(playerCount)
