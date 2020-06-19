@@ -35,7 +35,7 @@ bot.login(process.env.DISCORD_BOT_TOKEN);
 
 // listen for commands
 
-const avalon = require('./avalon/avalon.js')
+const {avalon} = require('./avalon/avalon.js')
 
 bot.on("message", async msg => {
   if (msg.author.bot) return;

@@ -10,4 +10,4 @@ function roleArrayToString(roles) {
     }
     return roleString;
   }
-  exports.roleArrayToString = roleArrayToString;
+module.exports.roleArrayToString = roleArrayToString;

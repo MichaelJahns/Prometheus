@@ -1,5 +1,5 @@
-module.exports = function collectVoiceChatParticipantIDs(msg) {
-  console.log("SUCCESS AT LAST")
+function collectVoiceChatParticipantIDs(msg) {
+  console.log("here")
   const voiceChannel = msg.member.voiceChannel;
   try {
     let applicants = voiceChannel.members.array();
@@ -11,6 +11,7 @@ module.exports = function collectVoiceChatParticipantIDs(msg) {
         participantIDs.push(applicant);
       }
     }
+    console.log(participantIDs)
     return participantIDs;
   } catch (error) {
     msg.channel.send(
@@ -18,19 +19,15 @@ module.exports = function collectVoiceChatParticipantIDs(msg) {
     );
   }
 }
-
-exports.collectVoiceChatParticipantIDs = this.collectVoiceChatParticipantIDs;
  
-module.exports = function randomNumberInRange(range) {
+function randomNumberInRange(range) {
   return Math.floor(Math.random() * Math.floor(range));
 }
-exports.randomNumberInRange = this.randomNumberInRange;
 
 async function cleanChat(msg, prefix){
   cleanUpBotMessages(msg);
   cleanUpMessagesToBots(msg, prefix);
 }
-exports.cleanChat = cleanUpBotMessages;
 
 async function cleanUpBotMessages(msg) {
   let history = await getHistory(msg);
@@ -62,4 +59,6 @@ async function getHistory(msg) {
   return historyArray;
 }
 
-
+module.exports.xyz = collectVoiceChatParticipantIDs;
+module.exports.randomNumberInRange = randomNumberInRange;
+module.exports.cleanChat = cleanChat;

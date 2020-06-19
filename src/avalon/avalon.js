@@ -2,15 +2,17 @@
 //++++++++++++
 //I wanna abstract this to its own file but am having difficulties accessing bot commands in a seperate sheet
 
-const createGame = require("./game.js");
-const collectVoiceChatParticipantIDs = require("../util/channelCommands.js");
-const randomNumberInRange = require("../util/tools.js");
+const getAvalonRoles = require("./gameState.js");
+const {xyz} = require("../util/channelCommands")
+const { randomNumberInRange }= require("../util/tools.js");
 
-module.exports = function avalon(msg) {
-  let contestants = collectVoiceChatParticipantIDs(msg);
-   // let playerCount = contestants.length;
-  // let roles = createGame(contestants.length);
-  // console.log(roles)
+function avalon(msg) {
+  let contestants = xyz(msg);
+  console.log(contestants)
+  let playerCount = contestants.length;
+  let roles = getAvalonRoles(playerCount)
+  console.log(playerCount)
+  console.log(roles)
   // const embed = buildAvalonEmbed(playerCount, roles, msg);
   // Catch roles as they are assigned
   // Grab from db discord id or create new profile
@@ -20,7 +22,7 @@ module.exports = function avalon(msg) {
 
   startGame(contestants, roles);
 }
-exports.avalon = this.avalon;
+module.exports.avalon = avalon;
 
 function startGame(contestants, roles) {
   for (let i = contestants.length; i > 0; i--) {
