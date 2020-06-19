@@ -1,3 +1,4 @@
+const {bot} = require('./server')
 const {db} = require('./firebase/firestoreFunctions')
 const {collectVoiceChatParticipantIDs} = require('./util/channelCommands')
 const {randomNumberInRange } = require('./util/tools')
@@ -35,29 +36,34 @@ function isNightOwned(date, msg) {
     });
 }
 
-function assignNightRandomly(date, msg) {
+async function assignNightRandomly(date, msg) {
   //get all users in voiceChannel
   let contestants = collectVoiceChatParticipantIDs(msg);
   //make a winning number and assign to a user
   const goldenTicket = randomNumberInRange(contestants.length);
-  const lottoWinner = contestants[goldenTicket];
+  const discordID = contestants[goldenTicket];
+  const nightWinner = await getUserFromDiscordID(discordID)
   // return that user and declare that it is their night
-  writeNight(lottoWinner, date, msg);
+  writeNight(nightWinner, date, msg);
 }
-function writeNight(lottoWinner, date, msg) {
-  return db
+
+async function getUserFromDiscordID(discordID){
+    return bot.fetchUser(discordID)
+}
+function writeNight(nightWinner, date, msg) {
+return db
     .collection("night")
     .doc(date)
     .set({
-      nightOwner: lottoWinner
+      nightOwner: nightWinner.id
     })
     .then(function (docRef) {
-      msg.channel.send(`Let tonight be ${lottoWinner}'s night.`);
-      console.log(`Night Owner ${lottoWinner} written to firestore`);
+      msg.channel.send(`Let tonight be ${nightWinner.username}'s night.`);
+      console.log(`Night Owner ${nightWinner.id} written to firestore`);
     })
     .catch(function (error) {
       msg.channel.send(`Failed to assign night..`);
-      console.log(`Failure to write ${lottoWinner} to firestore`);
+      console.log(`Failure to write ${nightWinner.id} to firestore`);
     });
 }
 
