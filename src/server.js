@@ -84,24 +84,3 @@ function aboutPrometheus(msg) {
       });
   });
 }
-
-// Team Captain Functions
-//=======================
-function pickCaptains(msg) {
-  if (msg.member.voiceChannel === undefined) {
-    msg.channel.send(`You must be in a voice channel to use this command.`);
-    return;
-  }
-  let contestants = collectVoiceChannelParticipantsIDs(msg.member.voiceChannel);
-  if (contestants.length >= 2) {
-    const ticketOne = randomNumberInRange(contestants.length);
-    const captainOne = contestants.splice(ticketOne, 1);
-    const ticketTwo = randomNumberInRange(contestants.length);
-    const captainTwo = contestants.splice(ticketTwo, 1);
-    msg.channel.send(
-      `Let ${captainOne} and ${captainTwo} be the team captains this game.`
-    );
-  } else {
-    msg.channel.send(`${msg.author} you are alone in that call.`);
-  }
-}
