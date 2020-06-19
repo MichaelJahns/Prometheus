@@ -1,5 +1,4 @@
 module.exports = function getAvalonRoles(playerCount) {
-  console.log("Get avalon roles")
   switch (playerCount) {
     case 1:
       return [Developer];

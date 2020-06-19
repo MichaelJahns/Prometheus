@@ -25,7 +25,6 @@ const avalonEmbed = new Discord.RichEmbed()
   .setFooter("Avalon designed by Don Eskridge");
 
 function buildAvalonEmbed(playerCount, roles, msg) {
-  console.log(roles);
   let embed = avalonEmbed;
   switch (playerCount) {
     case 1:
@@ -53,4 +52,4 @@ function buildAvalonEmbed(playerCount, roles, msg) {
   return embed;
 }
 
-exports.buildAvalonEmbed = buildAvalonEmbed;
+module.exports.buildAvalonEmbed = buildAvalonEmbed;

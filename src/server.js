@@ -1,19 +1,14 @@
+require('dotenv').config()
+
 const Discord = require("discord.js");
-const firebase = require("firebase/app");
-const firestore = require("firebase/firestore");
-const { firebaseConfig } = require("./firebase/config.js");
 const { commandsEmbed } = require("./ui/commandsEmbed");
 const { aboutEmbed } = require("./ui/aboutEmbed");
 
 const bot = new Discord.Client();
+module.exports.bot = bot;
 require("./util/eventLoader")(bot);
+
 const prefix = "-";
-exports.prefix = prefix;
-
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-
-
 bot.on("ready", async () => {
   console.log(`${bot.user.tag} is live.`);
   bot.user.setStatus("available");
@@ -36,7 +31,8 @@ bot.login(process.env.DISCORD_BOT_TOKEN);
 // listen for commands
 
 const {avalon} = require('./avalon/avalon.js')
-
+const {cleanChat} = require('./util/channelCommands')
+ 
 bot.on("message", async msg => {
   if (msg.author.bot) return;
   if (msg.channel.type === "dm") return;

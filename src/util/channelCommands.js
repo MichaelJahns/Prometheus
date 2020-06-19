@@ -1,5 +1,4 @@
 function collectVoiceChatParticipantIDs(msg) {
-  console.log("here")
   const voiceChannel = msg.member.voiceChannel;
   try {
     let applicants = voiceChannel.members.array();
@@ -11,7 +10,6 @@ function collectVoiceChatParticipantIDs(msg) {
         participantIDs.push(applicant);
       }
     }
-    console.log(participantIDs)
     return participantIDs;
   } catch (error) {
     msg.channel.send(
@@ -22,7 +20,7 @@ function collectVoiceChatParticipantIDs(msg) {
  0
 async function cleanChat(msg, prefix){
   cleanUpBotMessages(msg);
-  cleanUpMessagesToBots(msg, prefix);
+  // cleanUpMessagesToBots(msg, prefix);
 }
 
 async function cleanUpBotMessages(msg) {
@@ -36,18 +34,19 @@ async function cleanUpBotMessages(msg) {
   }
   msg.channel.send(`In the last 100 messages there are ${deletedMessagesCount} messages authored by bots. I am beggining to remove them.`);
 }
-
-async function cleanUpMessagesToBots(msg, prefix){
-  let history = await getHistory(msg);
-  let deletedMessagesCount = 0;
-  for(let msg of history){
-    if (msg.content.startsWith(prefix)) {
-      msg.delete();
-      deletedMessagesCount++;
-    }
-  }
-  msg.channel.send(`In the last 100 messages there are ${deletedMessagesCount} messages authored by bots. I am beggining to remove them.`);
-}
+on
+// This wasnt working so i abstracted it out of the core functionality above and hope to troubleshoot it in the future                                     
+// async function cleanUpMessagesToBots(msg, prefix){
+//   let history = await getHistory(msg);
+//   let deletedMessagesCount = 0;
+//   for(let msg of history){
+//     if (msg.content.startsWith(prefix)) {
+//       msg.delete();
+//       deletedMessagesCount++;
+//     }
+//   }
+//   msg.channel.send(`In the last 100 messages there are ${deletedMessagesCount} messages meant to be deliever to bots. I am beggining to remove them.`);
+// }
 
 async function getHistory(msg) {
   let history = await msg.channel.fetchMessages({ limit: 100 });
